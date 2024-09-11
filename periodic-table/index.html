@@ -1,0 +1,155 @@
+<head>
+    <title>School</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            text-align: center;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            align-items: center;
+        }
+        .centerthing {
+            display: flex;
+            justify-content: center;
+            text-align: center;
+        }
+    </style>
+</head>
+<body style="align-items: center;">
+    <audio id="SucessAudio" src="success.mp3"></audio>
+    <audio id="FailureAudio" src="failure.mp3"></audio>
+    <h3 id="TermP" style="text-align: center;font-size: 100;"></h3>
+    <div class="centerthing">
+        <input type="search" id="input" style="background-color: 3b3b3b;font-size: 100;text-align: center;"></input>
+    </div>
+    <div class="centerthing">
+        <button id="ModeChange" style="font-size: 50;margin-top: 10%;background-color: 3b3b3b;" onclick="toggleMode()">Elements</button>
+    </div>
+    <script>
+        const SucessAudio = document.querySelector("#SucessAudio");
+        const FailureAudio = document.querySelector("#FailureAudio");
+        const TermP = document.getElementById("TermP");
+        const Input = document.getElementById("input");
+        const ModeButton = document.getElementById("ModeChange");
+        const newFarAlong = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+        const newIsElementMode = true
+        let FarAlong = JSON.parse(localStorage.getItem('FarAlong')) || newFarAlong;
+        JSON.parse(localStorage.getItem("isElementMode")) || newIsElementMode
+        const Elements = [
+            "hydrogen", "helium", "lithium", "beryllium", "boron", "carbon", "nitrogen", "oxygen", "fluorine", "neon",
+            "sodium", "magnesium", "aluminum", "silicon", "phosphorus", "sulfur", "chlorine", "argon", "potassium", "calcium",
+            "scandium", "titanium", "vanadium", "chromium", "manganese", "iron", "cobalt", "nickel", "copper", "zinc",
+            "arsenic", "selenium", "bromine", "krypton", "rubidium", "strontium", "silver", "cadmium", "tin", "tellurium",
+            "iodine", "xenon", "cesium", "barium", "tungsten", "platinum", "gold", "mercury", "lead", "bismuth", "uranium"
+        ];
+        const Abbreviations = [
+            "H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne",
+            "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar", "K", "Ca",
+            "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn",
+            "As", "Se", "Br", "Kr", "Rb", "Sr", "Ag", "Cd", "Sn", "Te",
+            "I", "Xe", "Cs", "Ba", "W", "Pt", "Au", "Hg", "Pb", "Bi", "U"
+        ];
+        var A = Elements;
+        var B = Abbreviations;
+        var SetNumber = null;
+        var smallest = 4;
+
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        }
+
+        function endChecker() {
+            for (let I = 0; I < FarAlong.length; I++) {
+                const V = FarAlong[I];
+                var noneLeft = true;
+                if (FarAlong.length == I && FarAlong[SetNumber] < 3) {
+                    alert("Success");
+                }
+                if (V < 3) {
+                    noneLeft = false;
+                }
+                if (V < smallest) {
+                    smallest = V;
+                }
+            }
+            if (noneLeft == true) {
+                    alert("complete");
+                    FarAlong = newFarAlong;
+                    localStorage.setItem('FarAlong', JSON.stringify(FarAlong));
+                    return;
+            }
+        }
+
+        function getAplicable() {
+            var aplicable = [];
+            for (let I = 0; I < FarAlong.length; I++) {
+                
+                const V = FarAlong[I];
+                if (V <= smallest) {
+                    aplicable.push(I);
+                }
+                if (V < 3) {
+                    aplicable.push(I);
+                }
+            }
+            return aplicable;
+        }
+
+        function toggleMode() {
+            var E_Mode = localStorage.getItem("isElementMode") === "true";
+            console.log(E_Mode);
+            localStorage.setItem("isElementMode", !E_Mode);
+            if (E_Mode) {
+                console.log("b");
+                A = Elements;
+                B = Abbreviations;
+                ModeButton.innerText = "Elements";
+            } else {
+                console.log("a");
+                A = Abbreviations;
+                B = Elements;
+                ModeButton.innerText = "Abbreviations";
+            }
+            FarAlong = newFarAlong
+            Setup()
+            console.log(localStorage.getItem("isElementMode"));
+        }
+
+        
+        function Setup() {
+            Input.placeholder = "";
+            Input.value = null;
+            endChecker();
+            var aplicable = getAplicable();
+            SetNumber = aplicable[getRandomInt(aplicable.length)];
+            if (FarAlong[SetNumber] >= 3) {
+                Setup();
+            }
+            TermP.innerHTML = A[SetNumber];
+        }
+
+        Setup();
+
+        document.addEventListener("keypress", function KP(key) {
+            if (key.key == "Enter") {
+                if (Input.value == B[SetNumber]) {
+                    SucessAudio.play();
+                    FarAlong[SetNumber] += 1;
+                    localStorage.setItem('FarAlong', JSON.stringify(FarAlong));
+                    Setup();
+                } else {
+                    Input.value = null;
+                    Input.placeholder = B[SetNumber];
+                    FarAlong[SetNumber] -= 2;
+                    localStorage.setItem('FarAlong', JSON.stringify(FarAlong));
+                    FailureAudio.play();
+                }
+            }
+            if (key.key == "`") {
+                toggleMode();
+            }
+        });
+
+
+    </script>
+</body>
